@@ -16,13 +16,9 @@ ProductsRouter.route('/')
     .catch((err) => next(err))
 })
 .post((req, res, next) => {
-    Products.create(req.body)
-    .then((product) => {
-        res.statusCode = 200;
-        res.setHeader('content-type', 'application/json');
-        res.json(product);
-    }, (err) => next(err))
-    .catch((err) => next(err));
+    res.statusCode = 404;
+    var err = new Error('POST operation is not applicable here.')
+    next(err);
 })
 
 module.exports = ProductsRouter;

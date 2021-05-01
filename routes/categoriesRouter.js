@@ -9,6 +9,11 @@ var CategoriesRouter = express.Router();
 
 CategoriesRouter.use(bodyParser.json());
 
+const capitalizeFirst = (text) => {
+    return (text[0].toUpperCase()+text.slice(1))
+}
+
+
 CategoriesRouter.route('/')
 .get((req, res, next) => {
     Categories.find({})
@@ -33,7 +38,8 @@ CategoriesRouter.route('/')
 
 CategoriesRouter.route('/:categId')
 .get((req,res, next) => {
-    Categories.findById(req.params.categId)
+    console.log(req.params.categId);
+    Categories.findOne({categoryName: capitalizeFirst(req.params.categId)})
     .populate('products')
     .then((category) => {
         res.statusCode = 200;
@@ -67,7 +73,7 @@ CategoriesRouter.route('/:categId/products')
 })
 .post((req,res, next) => {
     Categories.findById(req.params.categId)
-    .populate('products')
+    // .populate('products')
     .then((category) => {
         if (category != null){
             Products.create(req.body)
@@ -131,7 +137,7 @@ CategoriesRouter.route('/:categId/products/:productId')
             }
             else{
                 res.statusCode = 404;
-                var err = new Error('Error: no such product id in the ');
+                var err = new Error('Error: no such product id in the category ' + category.categoryName);
                 next(err);
             }
         }
