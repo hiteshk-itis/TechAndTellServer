@@ -1,0 +1,6 @@
+users -> orders -> orderDetailsId
+orders -> orderDetails -> products
+
+/users -> orders[subdocument] with orderDetailsId
+/users/orders -> orderdetails populated with productsId
+/users/orders/products -> products ordered populated

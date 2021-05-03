@@ -7,7 +7,8 @@ const password = require('../Authentication/password');
 const authenticate = require('../Authentication/authenticate');
 const isAdmin = require('../middleware/adminAuth').isAdmin;
 /* GET users listing. */
-router.get('/', function(req, res, next) {
+router.get('/',passport.authenticate('jwt', {session: false}) ,function(req, res, next) {
+	console.log(req.isAuthenticated());
   User.find({})
   .then((user) => {
     res.statusCode = 200;
@@ -38,9 +39,10 @@ router.post('/signup',(req, res, next) => {
 
 })
 
-router.post('/login', passport.authenticate('local', {successMessage:"success", failureMessage:"Failed"}),(err, req, res, next) => {
+router.post('/login', passport.authenticate('local'),(req, res, next) => {
 	res.statusCode = 200;
-	res.json({sucess: true, msg: "congrats"});
+	const returned = authenticate.issueJwt(req.user);
+	res.json({token: returned.token, expiresIn: returned.expiresIn});
   }); 
 
 router.post('/signup/admin', (req, res,next) => {

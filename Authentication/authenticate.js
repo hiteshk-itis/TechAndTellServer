@@ -1,13 +1,17 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const User = require('../ models/userModel');
+const jwt = require('jsonwebtoken');
+const jwtStrategy = require('passport-jwt').Strategy;
+const ExtractJwt = require('passport-jwt').ExtractJwt;
+const fs = require('fs');
 const validatePassword = require('../Authentication/password').validatePassword;
 
 const Strategy = new LocalStrategy(
     (username, password, done) => {
         User.findOne({username: username})
-        .then((err, user) => {
-            if (!user) return done(err, false);
+        .then((user) => {
+            if (!user) return done(null, false);
             else if(user){
                 const passwd = validatePassword(password, user.salt, user.hash);
                 if(passwd)
@@ -37,3 +41,47 @@ passport.deserializeUser((userId, done) => {
     .catch((err) => done(err));
 })
 
+
+///////////////////json web token////////////////////////////////////
+
+// issuing json web token
+
+privKey = fs.readFileSync(__dirname+'/id_rsa_priv.pem', 'utf-8');
+exports.issueJwt = (user) => {
+
+    const payload = {
+        id: user._id,
+        iat: Date.now(),
+        expiresIn: '1d'
+    };
+
+    const token = jwt.sign(payload, privKey, {expiresIn: payload.expiresIn, algorithm: 'RS256'});
+
+    return {
+        token: 'Bearer '+token,
+        expiresIn: payload.expiresIn
+    }
+}
+
+//retreiving json web token strategy
+
+pubKey = fs.readFileSync(__dirname + '/id_rsa_pub.pem', 'utf-8');
+
+opts ={}
+opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+opts.secretOrKey = pubKey;
+opts.algorithm = ['RS256'];
+
+const strategyForJwt = new jwtStrategy(opts, (payload, done) =>{
+    User.find({_id: payload.id})
+    .then((user) => {
+        if(!user) 
+            done(null, false);
+        else{
+            done(null, user);
+        }
+    })
+    .catch((err) => done(err))
+})
+
+passport.use(strategyForJwt);
