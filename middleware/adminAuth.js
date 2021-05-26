@@ -1,6 +1,10 @@
 const passport = require('passport');
+const base64url = require('base64url');
+
 module.exports.isAdmin = (req, res, next) => {
-    if(req.isAuthenticated() && req.user.admin){
+    if(req.authorization){
+        const payload = req.authorization;
+        
         next();
     }
     else{

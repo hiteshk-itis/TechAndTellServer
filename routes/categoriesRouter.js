@@ -20,6 +20,7 @@ CategoriesRouter.route('/')
     .populate('products')
     .then((category) => {
         res.statusCode = 200;
+        
         res.setHeader('content-type', 'application/json');
         res.json(category);
     }, (err) =>next(err))

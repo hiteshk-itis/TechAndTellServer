@@ -51,7 +51,7 @@ exports.issueJwt = (user) => {
 
     const payload = {
         id: user._id,
-        iat: Date.now(),
+        admin: user.admin,
         expiresIn: '1d'
     };
 
