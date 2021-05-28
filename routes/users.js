@@ -14,9 +14,8 @@ router.use(express.urlencoded({
 }));
 
 /* GET users listing. */
-passport.authenticate('jwt', {session: false}), 
-router.get('/',cors.corsWithOptions, passport.authenticate('jwt', {session: false}),function(req, res, next) {
-	console.log(req.headers);
+router.get('/', passport.authenticate('jwt', {session: false}),function(req, res, next) {
+	
   User.find({})
   .then((user) => {
     res.statusCode = 200;

@@ -32,6 +32,11 @@ const ProductSchema = new Schema ({
     image: {
         type: String,
         required: true
+    }, 
+    featured:{
+        type: Boolean, 
+        required: true,
+        default:false
     }
     // ,
     // supplierID: {
